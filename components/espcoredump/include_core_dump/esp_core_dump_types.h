@@ -26,7 +26,23 @@ extern "C" {
 #include "esp_private/panic_internal.h"
 #include "core_dump_checksum.h"
 
+#if 0								// Changed mechanism to normal
+#define ESP_COREDUMP_LOG(level, format, ...)  							\
+	if (LOG_LOCAL_LEVEL >= level) {										\
+		esp_log_write(level, "crdp", DRAM_STR(format), ##__VA_ARGS__);	\
+	}
+
+#elif 1                             // Changed format, removed colour, added core#
+#define ESP_COREDUMP_LOG( level, format, ... ) 															\
+	if (LOG_LOCAL_LEVEL >= level) { 																	\
+		uint32_t mS = esp_log_early_timestamp();														\
+		esp_rom_printf(DRAM_STR("%d.%03d: #%d boot crdp - "), mS/1000, mS%1000, cpu_hal_get_core_id());	\
+ 		esp_rom_printf(DRAM_STR(format), ##__VA_ARGS__); 												\
+	}
+
+#else								// Original format & mechanism
 #define ESP_COREDUMP_LOG( level, format, ... )  if (LOG_LOCAL_LEVEL >= level)   { esp_rom_printf(DRAM_STR(format), esp_log_early_timestamp(), (const char *)TAG, ##__VA_ARGS__); }
+#endif
 #define ESP_COREDUMP_LOGE( format, ... )  ESP_COREDUMP_LOG(ESP_LOG_ERROR, LOG_FORMAT(E, format), ##__VA_ARGS__)
 #define ESP_COREDUMP_LOGW( format, ... )  ESP_COREDUMP_LOG(ESP_LOG_WARN, LOG_FORMAT(W, format), ##__VA_ARGS__)
 #define ESP_COREDUMP_LOGI( format, ... )  ESP_COREDUMP_LOG(ESP_LOG_INFO, LOG_FORMAT(I, format), ##__VA_ARGS__)
