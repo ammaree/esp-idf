@@ -646,3 +646,4 @@ void *heap_caps_aligned_calloc(size_t alignment, size_t n, size_t size, uint32_t
 
     return ptr;
 }
+#include "../../../heap_caps_extend.inc"
