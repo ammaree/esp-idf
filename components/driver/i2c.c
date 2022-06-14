@@ -78,7 +78,7 @@ static const char *I2C_TAG = "i2c";
     #define I2C_SLAVE_SDA_HOLD_DEFAULT     (10)        /* I2C slave hold time after scl negative edge default value */
 #endif
 #define I2C_MASTER_TOUT_CNUM_DEFAULT   (8)         /* I2C master timeout cycle number of I2C clock, after which the timeout interrupt will be triggered */
-#define I2C_ACKERR_CNT_MAX             (10)
+//#define I2C_ACKERR_CNT_MAX             (10)
 #define I2C_FILTER_CYC_NUM_DEF         (7)         /* The number of apb cycles filtered by default*/
 #define I2C_CLR_BUS_SCL_NUM            (9)
 #define I2C_CLR_BUS_HALF_PERIOD_US     (5)
@@ -1450,7 +1450,7 @@ esp_err_t i2c_master_cmd_begin(i2c_port_t i2c_num, i2c_cmd_handle_t cmd_handle, 
     }
 #endif
     // Sometimes when the FSM get stuck, the ACK_ERR interrupt will occur endlessly until we reset the FSM and clear bus.
-    static uint8_t clear_bus_cnt = 0;
+//  static uint8_t clear_bus_cnt = 0;
     esp_err_t ret = ESP_FAIL;
     i2c_obj_t *p_i2c = p_i2c_obj[i2c_num];
     TickType_t ticks_start = xTaskGetTickCount();
@@ -1465,7 +1465,7 @@ esp_err_t i2c_master_cmd_begin(i2c_port_t i2c_num, i2c_cmd_handle_t cmd_handle, 
     if (p_i2c->status == I2C_STATUS_TIMEOUT
             || i2c_hal_is_bus_busy(&(i2c_context[i2c_num].hal))) {
         i2c_hw_fsm_reset(i2c_num);
-        clear_bus_cnt = 0;
+//      clear_bus_cnt = 0;
     }
     i2c_reset_tx_fifo(i2c_num);
     i2c_reset_rx_fifo(i2c_num);
@@ -1511,13 +1511,13 @@ esp_err_t i2c_master_cmd_begin(i2c_port_t i2c_num, i2c_cmd_handle_t cmd_handle, 
                     // If the I2C slave are powered off or the SDA/SCL are connected to ground, for example,
                     // I2C hw FSM would get stuck in wrong state, we have to reset the I2C module in this case.
                     i2c_hw_fsm_reset(i2c_num);
-                    clear_bus_cnt = 0;
+//                  clear_bus_cnt = 0;
                     ret = ESP_ERR_TIMEOUT;
                 } else if (p_i2c->status == I2C_STATUS_ACK_ERROR) {
-                    clear_bus_cnt++;
-                    if (clear_bus_cnt >= I2C_ACKERR_CNT_MAX) {
-                        clear_bus_cnt = 0;
-                    }
+//                  clear_bus_cnt++;
+//                  if (clear_bus_cnt >= I2C_ACKERR_CNT_MAX) {
+//                      clear_bus_cnt = 0;
+//                  }
                     ret = ESP_FAIL;
                 } else {
                     ret = ESP_OK;
@@ -1531,7 +1531,7 @@ esp_err_t i2c_master_cmd_begin(i2c_port_t i2c_num, i2c_cmd_handle_t cmd_handle, 
             // If the I2C slave are powered off or the SDA/SCL are connected to ground, for example,
             // I2C hw FSM would get stuck in wrong state, we have to reset the I2C module in this case.
             i2c_hw_fsm_reset(i2c_num);
-            clear_bus_cnt = 0;
+//          clear_bus_cnt = 0;
             break;
         }
     }
